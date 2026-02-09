@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.controlsfx.control.ToggleSwitch?>
+<?import javafx.geometry.Insets?>
+<TabPane tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.timerserver.HelloController">
+    <tabs>
+        <Tab text="Статус компонентов">
+            <content>
+                <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                    <children>
+                        <Label text="Контент первой вкладки" layoutX="14.0" layoutY="14.0"/>
+                    </children>
+                </AnchorPane>
+            </content>
+        </Tab>
+        <Tab text="Настройка компонентов компонентов">
+            <content>
+
+                <GridPane hgap="10" vgap="10">
+
+                    <!-- Настройка ширины колонок (необязательно)  <padding><Insets top="25" right="25" bottom="25" left="25"/></padding> -->
+                    <columnConstraints>
+                        <ColumnConstraints prefWidth="150" halignment="RIGHT" />
+                        <ColumnConstraints prefWidth="150" halignment="RIGHT" />
+                        <ColumnConstraints prefWidth="150" halignment="RIGHT" />
+                    </columnConstraints>
+
+                        <Label text="Датчики" GridPane.halignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <ToggleSwitch fx:id="temperatureSwitch" text="Датчик температуры"
+                                      GridPane.columnIndex="0" GridPane.rowIndex="1" /> <!--onAction="#toggleAction"-->
+                        <ToggleSwitch fx:id="humiditySwitch" text="Датчик влажности"
+                                      GridPane.columnIndex="0" GridPane.rowIndex="2"/> <!--onAction="#toggleAction"-->
+                        <ToggleSwitch fx:id="illuminationSwitch" text="Датчик освещенности"
+                                      GridPane.columnIndex="0" GridPane.rowIndex="3"/> <!--onAction="#toggleAction"-->
+
+                        <Label text="Система вентилирования" GridPane.halignment="CENTER"
+                               GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                        <ToggleSwitch fx:id="systemVentilationSwitch" text="Состояние системы"
+                                      GridPane.columnIndex="1" GridPane.rowIndex="1"/> <!--onAction="#toggleAction"-->
+                        <ToggleSwitch fx:id="autoManualVentilationControlSwitch" text="Управление (авт/руч)"
+                                      GridPane.columnIndex="1" GridPane.rowIndex="2"/> <!--onAction="#toggleAction"-->
+                        <Slider fx:id="mySlider" visible="${autoManualVentilationControlSwitch.selected}"
+                                GridPane.columnIndex="1" GridPane.rowIndex="3"/> <!--managed-->
+                        <ToggleSwitch fx:id="quietModeSwitch" text="Тихий режим"
+                                      GridPane.columnIndex="1" GridPane.rowIndex="4"/> <!--onAction="#toggleAction"-->
+                        <ToggleSwitch fx:id="fullPowerMdeSwitch" text="Полная мощность"
+                                      GridPane.columnIndex="1" GridPane.rowIndex="5" /> <!--onAction="#toggleAction"-->
+                        <ToggleSwitch fx:id="forcedVentilationSwitch" text="Принудительное вентилирование"
+                                      GridPane.columnIndex="1" GridPane.rowIndex="6"/> <!--onAction="#toggleAction"-->
+
+                        <Label text="Система освещения" GridPane.halignment="CENTER"
+                               GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                        <ToggleSwitch fx:id="systemLightingControlSwitch" text="Состояние системы"
+                                      GridPane.columnIndex="2" GridPane.rowIndex="1"/> <!--onAction="#toggleAction"-->
+                        <ToggleSwitch fx:id="systemLightDisco" text="Дискотека"
+                                      GridPane.columnIndex="2" GridPane.rowIndex="2"/> <!--onAction="#toggleAction"-->
+                        <ToggleSwitch fx:id="systemLightILight" text="Я сама тут лампочка"
+                                      GridPane.columnIndex="2" GridPane.rowIndex="3"/> <!--onAction="#toggleAction"-->
+                        <Label text="Внимание!!! при включении варианта -Я сама себе лампочка- высок шанс поломки всвязи с подачей высокого напряжения"
+                               GridPane.columnIndex="2" GridPane.rowIndex="4"/>
+
+                </GridPane>
+
+
+
+            </content>
+        </Tab>
+        <Tab text="Настройки">
+            <content>
+                <VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml">
+
+                </VBox>
+            </content>
+        </Tab>
+    </tabs>
+</TabPane>
+
+
