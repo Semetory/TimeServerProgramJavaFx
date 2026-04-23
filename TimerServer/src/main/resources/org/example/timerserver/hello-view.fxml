@@ -81,7 +81,7 @@
                     </GridPane>
 
                     <!-- Консоль -->
-                    <TextArea fx:id="textArea" text="Консоль для вывода данных о системе"
+                    <TextArea fx:id="textArea"
                               prefHeight="120" maxHeight="120" VBox.vgrow="NEVER"
                               wrapText="true" editable="false"/>
 

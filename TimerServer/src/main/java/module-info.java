@@ -3,6 +3,7 @@ module org.example.timerserver {
     requires javafx.fxml;
     requires javafx.graphics;
     requires org.controlsfx.controls;
+    requires javafx.media;
 
 
     opens org.example.timerserver to javafx.fxml;

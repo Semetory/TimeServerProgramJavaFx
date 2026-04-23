@@ -86,6 +86,9 @@ public class HelloController {
         initCharts();
         startPulseTimer();
         startFailureCheckTimer();
+
+        // Изначально все элементы управления заблокированы
+        setAllControlsDisabled(true);
     }
 
     private void initSensors() {
@@ -98,86 +101,150 @@ public class HelloController {
         pulseServer.attach(lightSensor);
     }
 
+    private void setAllControlsDisabled(boolean disabled) {
+        // Датчики
+        temperatureSwitch.setDisable(disabled);
+        humiditySwitch.setDisable(disabled);
+        illuminationSwitch.setDisable(disabled);
+
+        // Система вентиляции
+        systemVentilationSwitch.setDisable(disabled);
+        autoManualVentilationControlSwitch.setDisable(disabled);
+        ventilationSlider.setDisable(disabled);
+        quietModeSwitch.setDisable(disabled);
+        fullPowerModeSwitch.setDisable(disabled);
+        forcedVentilationSwitch.setDisable(disabled);
+
+        // Система освещения
+        systemLightingControlSwitch.setDisable(disabled);
+        systemLightDisco.setDisable(disabled);
+        systemLightILight.setDisable(disabled);
+    }
+
     private void initUIComponents() {
         // Датчики
         temperatureSwitch.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            if (systemRunning) {
+            if (!systemRunning) {
                 if (newVal) {
+                    addLog("Ошибка: Система не запущена! Сначала запустите систему.");
+                    temperatureSwitch.setSelected(false);
+                }
+                return;
+            }
+
+            if (newVal) {
+                if (!tempSensor.isBroken()) {
                     tempSensor.activate();
                     addLog("Датчик температуры активирован");
                 } else {
-                    tempSensor.deactivate();
-                    addLog("Датчик температуры деактивирован");
+                    addLog("Ошибка: Датчик температуры сломан! Требуется ремонт.");
+                    temperatureSwitch.setSelected(false);
                 }
-                updateSensorStatus();
-            } else if (newVal) {
-                addLog("Ошибка: Система не запущена!");
-                temperatureSwitch.setSelected(false);
+            } else {
+                tempSensor.deactivate();
+                addLog("Датчик температуры деактивирован");
             }
+            updateSensorStatus();
         });
 
         humiditySwitch.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            if (systemRunning) {
+            if (!systemRunning) {
                 if (newVal) {
+                    addLog("Ошибка: Система не запущена! Сначала запустите систему.");
+                    humiditySwitch.setSelected(false);
+                }
+                return;
+            }
+
+            if (newVal) {
+                if (!humiditySensor.isBroken()) {
                     humiditySensor.activate();
                     addLog("Датчик влажности активирован");
                 } else {
-                    humiditySensor.deactivate();
-                    addLog("Датчик влажности деактивирован");
+                    addLog("Ошибка: Датчик влажности сломан! Требуется ремонт.");
+                    humiditySwitch.setSelected(false);
                 }
-                updateSensorStatus();
-            } else if (newVal) {
-                addLog("Ошибка: Система не запущена!");
-                humiditySwitch.setSelected(false);
+            } else {
+                humiditySensor.deactivate();
+                addLog("Датчик влажности деактивирован");
             }
+            updateSensorStatus();
         });
 
         illuminationSwitch.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            if (systemRunning) {
+            if (!systemRunning) {
                 if (newVal) {
+                    addLog("Ошибка: Система не запущена! Сначала запустите систему.");
+                    illuminationSwitch.setSelected(false);
+                }
+                return;
+            }
+
+            if (newVal) {
+                if (!lightSensor.isBroken()) {
                     lightSensor.activate();
                     addLog("Датчик освещенности активирован");
                 } else {
-                    lightSensor.deactivate();
-                    addLog("Датчик освещенности деактивирован");
+                    addLog("Ошибка: Датчик освещенности сломан! Требуется ремонт.");
+                    illuminationSwitch.setSelected(false);
                 }
-                updateSensorStatus();
-            } else if (newVal) {
-                addLog("Ошибка: Система не запущена!");
-                illuminationSwitch.setSelected(false);
+            } else {
+                lightSensor.deactivate();
+                addLog("Датчик освещенности деактивирован");
             }
+            updateSensorStatus();
         });
 
         // Система вентиляции
         systemVentilationSwitch.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            if (systemRunning && !ventilationBroken) {
+            if (!systemRunning) {
                 if (newVal) {
+                    addLog("Ошибка: Система не запущена! Сначала запустите систему.");
+                    systemVentilationSwitch.setSelected(false);
+                }
+                return;
+            }
+
+            if (newVal) {
+                if (!ventilationBroken) {
                     addLog("Система вентиляции включена");
                     ventilationSeries.getData().clear();
                     updateVentilationPower(40);
+                    // При включении вентиляции разблокируем элементы управления
+                    setVentilationControlsEnabled(true);
                 } else {
-                    addLog("Система вентиляции выключена");
-                    ventilationSeries.getData().clear();
+                    addLog("Ошибка: Система вентиляции сломана! Требуется ремонт.");
+                    systemVentilationSwitch.setSelected(false);
                 }
-                updateVentilationStatus();
-            } else if (!systemRunning && newVal) {
-                addLog("Ошибка: Система не запущена!");
-                systemVentilationSwitch.setSelected(false);
-            } else if (ventilationBroken && newVal) {
-                addLog("Ошибка: Система вентиляции сломана! Требуется ремонт.");
-                systemVentilationSwitch.setSelected(false);
+            } else {
+                addLog("Система вентиляции выключена");
+                ventilationSeries.getData().clear();
+                // Блокируем все элементы управления вентиляцией
+                setVentilationControlsEnabled(false);
             }
+            updateVentilationStatus();
         });
 
         autoManualVentilationControlSwitch.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            if (systemRunning && systemVentilationSwitch.isSelected() && !ventilationBroken) {
-                ventilationSlider.setVisible(newVal);
-                if (newVal) {
-                    addLog("Управление вентиляцией переключено на ручной режим");
-                } else {
-                    addLog("Управление вентиляцией переключено на автоматический режим");
-                    applyVentilationMode();
+            if (!systemRunning || !systemVentilationSwitch.isSelected() || ventilationBroken) {
+                if (newVal && (!systemRunning || !systemVentilationSwitch.isSelected())) {
+                    addLog("Ошибка: Сначала включите систему вентиляции!");
+                    autoManualVentilationControlSwitch.setSelected(false);
+                } else if (newVal && ventilationBroken) {
+                    addLog("Ошибка: Система вентиляции сломана! Невозможно переключить режим.");
+                    autoManualVentilationControlSwitch.setSelected(false);
                 }
+                return;
+            }
+
+            ventilationSlider.setVisible(newVal);
+            ventilationSlider.setDisable(!newVal);
+
+            if (newVal) {
+                addLog("Управление вентиляцией переключено на ручной режим");
+            } else {
+                addLog("Управление вентиляцией переключено на автоматический режим");
+                applyVentilationMode();
             }
         });
 
@@ -190,65 +257,98 @@ public class HelloController {
         });
 
         quietModeSwitch.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!systemRunning || !systemVentilationSwitch.isSelected() || ventilationBroken) {
+                if (newVal) {
+                    addLog("Ошибка: Невозможно активировать режим. Система вентиляции выключена или сломана!");
+                    quietModeSwitch.setSelected(false);
+                }
+                return;
+            }
+
             if (newVal) {
                 fullPowerModeSwitch.setSelected(false);
                 forcedVentilationSwitch.setSelected(false);
-                if (systemRunning && systemVentilationSwitch.isSelected() && !ventilationBroken) {
-                    autoManualVentilationControlSwitch.setSelected(false);
-                    updateVentilationPower(15);
-                    addLog("Тихий режим активирован (мощность 15%)");
-                }
+                autoManualVentilationControlSwitch.setSelected(false);
+                updateVentilationPower(15);
+                addLog("Тихий режим активирован (мощность 15%)");
             }
         });
 
         fullPowerModeSwitch.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!systemRunning || !systemVentilationSwitch.isSelected() || ventilationBroken) {
+                if (newVal) {
+                    addLog("Ошибка: Невозможно активировать режим. Система вентиляции выключена или сломана!");
+                    fullPowerModeSwitch.setSelected(false);
+                }
+                return;
+            }
+
             if (newVal) {
                 quietModeSwitch.setSelected(false);
                 forcedVentilationSwitch.setSelected(false);
-                if (systemRunning && systemVentilationSwitch.isSelected() && !ventilationBroken) {
-                    autoManualVentilationControlSwitch.setSelected(false);
-                    updateVentilationPower(80);
-                    addLog("Режим полной мощности активирован (мощность 80%)");
-                }
+                autoManualVentilationControlSwitch.setSelected(false);
+                updateVentilationPower(80);
+                addLog("Режим полной мощности активирован (мощность 80%)");
             }
         });
 
         forcedVentilationSwitch.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!systemRunning || !systemVentilationSwitch.isSelected() || ventilationBroken) {
+                if (newVal) {
+                    addLog("Ошибка: Невозможно активировать режим. Система вентиляции выключена или сломана!");
+                    forcedVentilationSwitch.setSelected(false);
+                }
+                return;
+            }
+
             if (newVal) {
                 quietModeSwitch.setSelected(false);
                 fullPowerModeSwitch.setSelected(false);
-                if (systemRunning && systemVentilationSwitch.isSelected() && !ventilationBroken) {
-                    autoManualVentilationControlSwitch.setSelected(false);
-                    updateVentilationPower(100);
-                    addLog("Принудительное вентилирование активировано (мощность 100%) - повышенный риск поломки!");
-                }
+                autoManualVentilationControlSwitch.setSelected(false);
+                updateVentilationPower(100);
+                addLog("Принудительное вентилирование активировано (мощность 100%) - повышенный риск поломки!");
             }
         });
 
         // Система освещения
         systemLightingControlSwitch.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            if (systemRunning && !lightingBroken) {
+            if (!systemRunning) {
                 if (newVal) {
+                    addLog("Ошибка: Система не запущена! Сначала запустите систему.");
+                    systemLightingControlSwitch.setSelected(false);
+                }
+                return;
+            }
+
+            if (newVal) {
+                if (!lightingBroken) {
                     addLog("Система освещения включена");
                     lightingIsOn = true;
                     updateLightingStatus();
+                    setLightingControlsEnabled(true);
                 } else {
-                    addLog("Система освещения выключена");
-                    lightingIsOn = false;
-                    updateLightingStatus();
-                    stopDiscoMode();
+                    addLog("Ошибка: Система освещения сломана! Требуется ремонт.");
+                    systemLightingControlSwitch.setSelected(false);
                 }
-            } else if (!systemRunning && newVal) {
-                addLog("Ошибка: Система не запущена!");
-                systemLightingControlSwitch.setSelected(false);
-            } else if (lightingBroken && newVal) {
-                addLog("Ошибка: Система освещения сломана! Требуется ремонт.");
-                systemLightingControlSwitch.setSelected(false);
+            } else {
+                addLog("Система освещения выключена");
+                lightingIsOn = false;
+                updateLightingStatus();
+                stopDiscoMode();
+                setLightingControlsEnabled(false);
             }
         });
 
         systemLightDisco.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal && systemLightingControlSwitch.isSelected() && !lightingBroken) {
+            if (!systemRunning || !systemLightingControlSwitch.isSelected() || lightingBroken) {
+                if (newVal) {
+                    addLog("Ошибка: Невозможно активировать режим. Система освещения выключена или сломана!");
+                    systemLightDisco.setSelected(false);
+                }
+                return;
+            }
+
+            if (newVal) {
                 systemLightILight.setSelected(false);
                 startDiscoMode(1.2);
                 addLog("Режим 'Дискотека' активирован (мигание раз в 1.2 сек)");
@@ -260,7 +360,15 @@ public class HelloController {
         });
 
         systemLightILight.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal && systemLightingControlSwitch.isSelected() && !lightingBroken) {
+            if (!systemRunning || !systemLightingControlSwitch.isSelected() || lightingBroken) {
+                if (newVal) {
+                    addLog("Ошибка: Невозможно активировать режим. Система освещения выключена или сломана!");
+                    systemLightILight.setSelected(false);
+                }
+                return;
+            }
+
+            if (newVal) {
                 systemLightDisco.setSelected(false);
                 startDiscoMode(0.25);
                 addLog("Режим 'Турбо' активирован (мигание раз в 0.25 сек) - ВЫСОКИЙ РИСК ПОЛОМКИ!");
@@ -286,6 +394,11 @@ public class HelloController {
                     tempSensor.repair();
                     addLog("Датчик температуры отремонтирован");
                     updateSensorStatus();
+                    // Если датчик был включен до поломки, автоматически включаем его
+                    if (temperatureSwitch.isSelected()) {
+                        tempSensor.activate();
+                        addLog("Датчик температуры автоматически активирован");
+                    }
                 } else {
                     addLog("Датчик температуры исправен");
                 }
@@ -298,6 +411,10 @@ public class HelloController {
                     humiditySensor.repair();
                     addLog("Датчик влажности отремонтирован");
                     updateSensorStatus();
+                    if (humiditySwitch.isSelected()) {
+                        humiditySensor.activate();
+                        addLog("Датчик влажности автоматически активирован");
+                    }
                 } else {
                     addLog("Датчик влажности исправен");
                 }
@@ -310,6 +427,10 @@ public class HelloController {
                     lightSensor.repair();
                     addLog("Датчик освещенности отремонтирован");
                     updateSensorStatus();
+                    if (illuminationSwitch.isSelected()) {
+                        lightSensor.activate();
+                        addLog("Датчик освещенности автоматически активирован");
+                    }
                 } else {
                     addLog("Датчик освещенности исправен");
                 }
@@ -337,13 +458,34 @@ public class HelloController {
         }
     }
 
+    private void setVentilationControlsEnabled(boolean enabled) {
+        autoManualVentilationControlSwitch.setDisable(!enabled);
+        ventilationSlider.setDisable(!enabled || !autoManualVentilationControlSwitch.isSelected());
+        quietModeSwitch.setDisable(!enabled);
+        fullPowerModeSwitch.setDisable(!enabled);
+        forcedVentilationSwitch.setDisable(!enabled);
+    }
+
+    private void setLightingControlsEnabled(boolean enabled) {
+        systemLightDisco.setDisable(!enabled);
+        systemLightILight.setDisable(!enabled);
+    }
+
     private void startSystem() {
         if (!systemRunning) {
             systemRunning = true;
             localTime = 0;
 
+            // Разблокируем все элементы управления
+            setAllControlsDisabled(false);
+
             addLog("=== СИСТЕМА ЗАПУЩЕНА ===");
             addLog("Автоматическая активация всех датчиков через 5 секунд...");
+
+            // Устанавливаем прямоугольники в серый цвет (неактивны)
+            updateSensorStatus();
+            updateVentilationStatus();
+            updateLightingStatus();
 
             Timeline delayTimeline = new Timeline(new KeyFrame(Duration.seconds(5), ev -> {
                 if (systemRunning) {
@@ -364,20 +506,42 @@ public class HelloController {
     private void stopSystem() {
         if (systemRunning) {
             systemRunning = false;
+
+            // Выключаем все переключатели
             temperatureSwitch.setSelected(false);
             humiditySwitch.setSelected(false);
             illuminationSwitch.setSelected(false);
             systemVentilationSwitch.setSelected(false);
             systemLightingControlSwitch.setSelected(false);
 
+            // Деактивируем датчики
             tempSensor.deactivate();
             humiditySensor.deactivate();
             lightSensor.deactivate();
 
+            // Останавливаем режимы
             stopDiscoMode();
+            lightingIsOn = false;
+
+            // Блокируем все элементы управления
+            setAllControlsDisabled(true);
+
+            // Устанавливаем красный цвет для всех прямоугольников
+            updateAllRectanglesToRed();
+
             addLog("=== СИСТЕМА ОСТАНОВЛЕНА ===");
             clearCharts();
         }
+    }
+
+    private void updateAllRectanglesToRed() {
+        Platform.runLater(() -> {
+            if (tempRect != null) tempRect.setFill(Color.RED);
+            if (humidityRect != null) humidityRect.setFill(Color.RED);
+            if (lightRect != null) lightRect.setFill(Color.RED);
+            if (ventilationRect != null) ventilationRect.setFill(Color.RED);
+            if (lightingRect != null) lightingRect.setFill(Color.RED);
+        });
     }
 
     private void startPulseTimer() {
@@ -403,7 +567,7 @@ public class HelloController {
     }
 
     private void checkRandomFailures() {
-        // Случайные поломки с шансом 80% раз в 10 секунд
+        // Случайные поломки датчиков
         if (Math.random() < 0.8) {
             if (temperatureSwitch.isSelected() && !tempSensor.isBroken() && Math.random() < 0.3) {
                 tempSensor.breakSensor();
@@ -502,7 +666,7 @@ public class HelloController {
         stopDiscoMode();
         discoBlinking = true;
         discoTimeline = new Timeline(new KeyFrame(Duration.seconds(interval), ev -> {
-            if (discoBlinking && systemLightingControlSwitch.isSelected() && !lightingBroken) {
+            if (discoBlinking && systemLightingControlSwitch.isSelected() && !lightingBroken && systemRunning) {
                 lightingIsOn = !lightingIsOn;
                 updateLightingStatus();
             }
@@ -521,21 +685,24 @@ public class HelloController {
     private void updateSensorStatus() {
         Platform.runLater(() -> {
             if (tempRect != null) {
-                if (!temperatureSwitch.isSelected()) tempRect.setFill(Color.GRAY);
+                if (!systemRunning) tempRect.setFill(Color.RED);
+                else if (!temperatureSwitch.isSelected()) tempRect.setFill(Color.GRAY);
                 else if (tempSensor.isBroken()) tempRect.setFill(Color.RED);
                 else if (tempSensor.isJustBroken()) tempRect.setFill(Color.YELLOW);
                 else tempRect.setFill(Color.GREEN);
             }
 
             if (humidityRect != null) {
-                if (!humiditySwitch.isSelected()) humidityRect.setFill(Color.GRAY);
+                if (!systemRunning) humidityRect.setFill(Color.RED);
+                else if (!humiditySwitch.isSelected()) humidityRect.setFill(Color.GRAY);
                 else if (humiditySensor.isBroken()) humidityRect.setFill(Color.RED);
                 else if (humiditySensor.isJustBroken()) humidityRect.setFill(Color.YELLOW);
                 else humidityRect.setFill(Color.GREEN);
             }
 
             if (lightRect != null) {
-                if (!illuminationSwitch.isSelected()) lightRect.setFill(Color.GRAY);
+                if (!systemRunning) lightRect.setFill(Color.RED);
+                else if (!illuminationSwitch.isSelected()) lightRect.setFill(Color.GRAY);
                 else if (lightSensor.isBroken()) lightRect.setFill(Color.RED);
                 else if (lightSensor.isJustBroken()) lightRect.setFill(Color.YELLOW);
                 else lightRect.setFill(Color.GREEN);
@@ -556,7 +723,8 @@ public class HelloController {
     private void updateVentilationStatus() {
         Platform.runLater(() -> {
             if (ventilationRect != null) {
-                if (!systemVentilationSwitch.isSelected()) ventilationRect.setFill(Color.GRAY);
+                if (!systemRunning) ventilationRect.setFill(Color.RED);
+                else if (!systemVentilationSwitch.isSelected()) ventilationRect.setFill(Color.GRAY);
                 else if (ventilationBroken) ventilationRect.setFill(Color.RED);
                 else if (ventilationJustBroken) ventilationRect.setFill(Color.YELLOW);
                 else ventilationRect.setFill(Color.GREEN);
@@ -576,7 +744,8 @@ public class HelloController {
     private void updateLightingStatus() {
         Platform.runLater(() -> {
             if (lightingRect != null) {
-                if (!systemLightingControlSwitch.isSelected()) lightingRect.setFill(Color.GRAY);
+                if (!systemRunning) lightingRect.setFill(Color.RED);
+                else if (!systemLightingControlSwitch.isSelected()) lightingRect.setFill(Color.GRAY);
                 else if (lightingBroken) lightingRect.setFill(Color.RED);
                 else if (lightingJustBroken) lightingRect.setFill(Color.YELLOW);
                 else if (lightingIsOn) lightingRect.setFill(Color.YELLOW);
@@ -598,6 +767,7 @@ public class HelloController {
         ventilationBroken = true;
         ventilationJustBroken = true;
         systemVentilationSwitch.setSelected(false);
+        setVentilationControlsEnabled(false);
         autoManualVentilationControlSwitch.setSelected(false);
         quietModeSwitch.setSelected(false);
         fullPowerModeSwitch.setSelected(false);
@@ -622,6 +792,7 @@ public class HelloController {
         lightingJustBroken = true;
         lightingIsOn = false;
         systemLightingControlSwitch.setSelected(false);
+        setLightingControlsEnabled(false);
         systemLightDisco.setSelected(false);
         systemLightILight.setSelected(false);
         stopDiscoMode();
