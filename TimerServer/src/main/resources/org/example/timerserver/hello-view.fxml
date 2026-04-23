@@ -4,77 +4,151 @@
 <?import javafx.scene.layout.*?>
 <?import org.controlsfx.control.ToggleSwitch?>
 <?import javafx.geometry.Insets?>
-<TabPane tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.timerserver.HelloController">
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+
+<TabPane tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/17"
+         xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.timerserver.HelloController">
     <tabs>
         <Tab text="Статус компонентов">
             <content>
-                <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                    <children>
-                        <Label text="Контент первой вкладки" layoutX="14.0" layoutY="14.0"/>
-                    </children>
-                </AnchorPane>
-            </content>
-        </Tab>
-        <Tab text="Настройка компонентов компонентов">
-            <content>
+                <VBox spacing="10" alignment="CENTER">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
 
-                <GridPane hgap="10" vgap="10">
+                    <GridPane hgap="10" vgap="10" VBox.vgrow="ALWAYS">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="15" halignment="CENTER" />
+                            <ColumnConstraints percentWidth="5" halignment="CENTER" />
+                            <ColumnConstraints percentWidth="25" halignment="CENTER" />
+                            <ColumnConstraints percentWidth="45" halignment="CENTER" />
+                        </columnConstraints>
 
-                    <!-- Настройка ширины колонок (необязательно)  <padding><Insets top="25" right="25" bottom="25" left="25"/></padding> -->
-                    <columnConstraints>
-                        <ColumnConstraints prefWidth="150" halignment="RIGHT" />
-                        <ColumnConstraints prefWidth="150" halignment="RIGHT" />
-                        <ColumnConstraints prefWidth="150" halignment="RIGHT" />
-                    </columnConstraints>
-
-                        <Label text="Датчики" GridPane.halignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                        <ToggleSwitch fx:id="temperatureSwitch" text="Датчик температуры"
-                                      GridPane.columnIndex="0" GridPane.rowIndex="1" /> <!--onAction="#toggleAction"-->
-                        <ToggleSwitch fx:id="humiditySwitch" text="Датчик влажности"
-                                      GridPane.columnIndex="0" GridPane.rowIndex="2"/> <!--onAction="#toggleAction"-->
-                        <ToggleSwitch fx:id="illuminationSwitch" text="Датчик освещенности"
-                                      GridPane.columnIndex="0" GridPane.rowIndex="3"/> <!--onAction="#toggleAction"-->
-
-                        <Label text="Система вентилирования" GridPane.halignment="CENTER"
-                               GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                        <ToggleSwitch fx:id="systemVentilationSwitch" text="Состояние системы"
-                                      GridPane.columnIndex="1" GridPane.rowIndex="1"/> <!--onAction="#toggleAction"-->
-                        <ToggleSwitch fx:id="autoManualVentilationControlSwitch" text="Управление (авт/руч)"
-                                      GridPane.columnIndex="1" GridPane.rowIndex="2"/> <!--onAction="#toggleAction"-->
-                        <Slider fx:id="mySlider" visible="${autoManualVentilationControlSwitch.selected}"
-                                GridPane.columnIndex="1" GridPane.rowIndex="3"/> <!--managed-->
-                        <ToggleSwitch fx:id="quietModeSwitch" text="Тихий режим"
-                                      GridPane.columnIndex="1" GridPane.rowIndex="4"/> <!--onAction="#toggleAction"-->
-                        <ToggleSwitch fx:id="fullPowerMdeSwitch" text="Полная мощность"
-                                      GridPane.columnIndex="1" GridPane.rowIndex="5" /> <!--onAction="#toggleAction"-->
-                        <ToggleSwitch fx:id="forcedVentilationSwitch" text="Принудительное вентилирование"
-                                      GridPane.columnIndex="1" GridPane.rowIndex="6"/> <!--onAction="#toggleAction"-->
-
-                        <Label text="Система освещения" GridPane.halignment="CENTER"
+                        <Label text="Текущий статус" style="-fx-font-weight: bold"
+                               GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2"/>
+                        <Label text="Управление" style="-fx-font-weight: bold"
                                GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-                        <ToggleSwitch fx:id="systemLightingControlSwitch" text="Состояние системы"
-                                      GridPane.columnIndex="2" GridPane.rowIndex="1"/> <!--onAction="#toggleAction"-->
-                        <ToggleSwitch fx:id="systemLightDisco" text="Дискотека"
-                                      GridPane.columnIndex="2" GridPane.rowIndex="2"/> <!--onAction="#toggleAction"-->
-                        <ToggleSwitch fx:id="systemLightILight" text="Я сама тут лампочка"
-                                      GridPane.columnIndex="2" GridPane.rowIndex="3"/> <!--onAction="#toggleAction"-->
-                        <Label text="Внимание!!! при включении варианта -Я сама себе лампочка- высок шанс поломки всвязи с подачей высокого напряжения"
-                               GridPane.columnIndex="2" GridPane.rowIndex="4"/>
+                        <Label text="График" style="-fx-font-weight: bold"
+                               GridPane.columnIndex="3" GridPane.rowIndex="0"/>
 
-                </GridPane>
+                        <!-- Датчик температуры -->
+                        <Label text="Датчик температуры" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <Rectangle fx:id="tempRect" width="32" height="8" fill="red" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        <Button fx:id="repairTempBtn" text="Отремонтировать" maxWidth="-Infinity"
+                                GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.halignment="CENTER"/>
 
+                        <!-- Датчик влажности -->
+                        <Label text="Датчик влажности" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <Rectangle fx:id="humidityRect" width="32" height="8" fill="red" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                        <Button fx:id="repairHumidityBtn" text="Отремонтировать" maxWidth="-Infinity"
+                                GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.halignment="CENTER"/>
 
+                        <!-- Датчик освещенности -->
+                        <Label text="Датчик освещенности" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                        <Rectangle fx:id="lightRect" width="32" height="8" fill="red" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                        <Button fx:id="repairLightBtn" text="Отремонтировать" maxWidth="-Infinity"
+                                GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.halignment="CENTER"/>
 
+                        <!-- Система вентиляции -->
+                        <Label text="Система вентиляции" style="-fx-font-weight: bold"
+                               GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2"/>
+                        <Label text="Текущий режим:" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+                        <Rectangle fx:id="ventilationRect" width="32" height="8" fill="red" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                        <Button fx:id="restartVentilationBtn" text="Перезапустить" maxWidth="-Infinity"
+                                GridPane.columnIndex="2" GridPane.rowIndex="4" GridPane.rowSpan="2" GridPane.halignment="CENTER"/>
+
+                        <!-- Система освещения -->
+                        <Label text="Система освещения" style="-fx-font-weight: bold"
+                               GridPane.columnIndex="0" GridPane.rowIndex="6" GridPane.columnSpan="2"/>
+                        <Label text="Текущий режим:" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+                        <Rectangle fx:id="lightingRect" width="32" height="8" fill="red" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+                        <Button fx:id="repairLightingBtn" text="Отремонтировать" maxWidth="-Infinity"
+                                GridPane.columnIndex="2" GridPane.rowIndex="6" GridPane.rowSpan="2" GridPane.halignment="CENTER"/>
+
+                        <!-- График -->
+                        <LineChart fx:id="lineChart" maxHeight="300"
+                                   GridPane.columnIndex="3" GridPane.rowIndex="1" GridPane.rowSpan="7"
+                                   GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+                            <xAxis>
+                                <NumberAxis label="Время" fx:id="xAxis" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis label="Показатель" side="LEFT" />
+                            </yAxis>
+                        </LineChart>
+                    </GridPane>
+
+                    <!-- Консоль -->
+                    <TextArea fx:id="textArea" text="Консоль для вывода данных о системе"
+                              prefHeight="120" maxHeight="120" VBox.vgrow="NEVER"
+                              wrapText="true" editable="false"/>
+
+                    <!-- Кнопки управления системой -->
+                    <HBox spacing="10" alignment="CENTER" VBox.vgrow="NEVER">
+                        <Button fx:id="startSystemBtn" text="Запустить систему" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="stopSystemBtn" text="Остановить систему" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                    </HBox>
+                </VBox>
             </content>
         </Tab>
-        <Tab text="Настройки">
-            <content>
-                <VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml">
 
-                </VBox>
+        <Tab text="Настройка компонентов">
+            <content>
+                <ScrollPane fitToWidth="true" fitToHeight="true">
+                    <VBox spacing="20" alignment="CENTER">
+                        <padding>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
+                        </padding>
+
+                        <!-- Датчики -->
+                        <TitledPane text="Датчики" collapsible="false" maxWidth="Infinity">
+                            <VBox spacing="10">
+                                <padding>
+                                    <Insets top="10" right="10" bottom="10" left="10"/>
+                                </padding>
+
+                                <ToggleSwitch fx:id="temperatureSwitch" text="Датчик температуры" maxWidth="Infinity"/>
+                                <ToggleSwitch fx:id="humiditySwitch" text="Датчик влажности" maxWidth="Infinity"/>
+                                <ToggleSwitch fx:id="illuminationSwitch" text="Датчик освещенности" maxWidth="Infinity"/>
+                            </VBox>
+                        </TitledPane>
+
+                        <!-- Система вентиляции -->
+                        <TitledPane text="Система вентиляции" collapsible="false" maxWidth="Infinity">
+                            <VBox spacing="10">
+                                <padding>
+                                    <Insets top="10" right="10" bottom="10" left="10"/>
+                                </padding>
+
+                                <ToggleSwitch fx:id="systemVentilationSwitch" text="Состояние системы" maxWidth="Infinity"/>
+                                <ToggleSwitch fx:id="autoManualVentilationControlSwitch" text="Управление (авт/руч)" maxWidth="Infinity"/>
+
+                                <Slider fx:id="ventilationSlider" maxWidth="Infinity" showTickMarks="true" showTickLabels="true" min="0" max="100" value="40"/>
+
+                                <ToggleSwitch fx:id="quietModeSwitch" text="Тихий режим" maxWidth="Infinity"/>
+                                <ToggleSwitch fx:id="fullPowerModeSwitch" text="Полная мощность" maxWidth="Infinity"/>
+                                <ToggleSwitch fx:id="forcedVentilationSwitch" text="Принудительное вентилирование" maxWidth="Infinity"/>
+                            </VBox>
+                        </TitledPane>
+
+                        <!-- Система освещения -->
+                        <TitledPane text="Система освещения" collapsible="false" maxWidth="Infinity">
+                            <VBox spacing="10">
+                                <padding>
+                                    <Insets top="10" right="10" bottom="10" left="10"/>
+                                </padding>
+
+                                <ToggleSwitch fx:id="systemLightingControlSwitch" text="Состояние системы" maxWidth="Infinity"/>
+                                <ToggleSwitch fx:id="systemLightDisco" text="Режим: Дискотека" maxWidth="Infinity"/>
+                                <ToggleSwitch fx:id="systemLightILight" text="Режим: Турбо" maxWidth="Infinity"/>
+                                <Label text="⚠ Турбо: высокая вероятность поломки" style="-fx-text-fill: orange; -fx-font-weight: bold"/>
+                            </VBox>
+                        </TitledPane>
+                    </VBox>
+                </ScrollPane>
             </content>
         </Tab>
     </tabs>
 </TabPane>
-
-

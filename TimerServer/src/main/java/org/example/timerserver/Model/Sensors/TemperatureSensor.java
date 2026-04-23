@@ -1,36 +1,55 @@
 package org.example.timerserver.Model.Sensors;
 
+import javafx.application.Platform;
 import org.example.timerserver.Model.Observer;
+import javafx.scene.control.TextArea;
 
 public class TemperatureSensor implements Observer {
-    private int currentTemperature;
+    private boolean active = false;
+    private boolean broken = false;
+    private boolean justBroken = false;
+    private int lastValue = 0;
+    private TextArea console;
+
+    public TemperatureSensor(TextArea console) {
+        this.console = console;
+    }
 
     @Override
     public void update(String message) {
-        if ("TICK".equals(message)) {
-            temperature();
+        if (active && !broken && "TICK".equals(message)) {
+            measure();
         }
     }
 
-    private void temperature() {
-        // Логика измерения температуры и влажности
-        currentTemperature = reciviningValueTemperature();
-        System.out.println("Измерение температуры: " + currentTemperature + "°C, ");
+    private void measure() {
+        lastValue = receiveValue();
+        addToConsole("Измерение температуры: " + lastValue + "°C");
     }
 
-    private int reciviningValueTemperature(){
+    private int receiveValue() {
+        // Реалистичные значения температуры от -10 до +40
+        return -10 + (int)(Math.random() * 50);
+    }
 
-        int x1 = 0;
-        int x2 = 100;
+    public void activate() { active = true; }
+    public void deactivate() { active = false; }
+    public void breakSensor() {
+        broken = true;
+        justBroken = true;
+        active = false;
+    }
+    public void repair() {
+        broken = false;
+        justBroken = false;
+        active = true;
+    }
+    public boolean isBroken() { return broken; }
+    public boolean isJustBroken() { return justBroken; }
+    public void resetJustBroken() { justBroken = false; }
+    public int getLastValue() { return lastValue; }
 
-        int rVL = 1;
-        int f = 1;
-        int a = 1;
-
-        f = (int) (Math.random()/Math.negateExact(a));
-        rVL = x1*(x1-f)+x2*f;
-
-        return rVL;
-
+    private void addToConsole(String msg) {
+        Platform.runLater(() -> console.appendText(msg + "\n"));
     }
 }
