@@ -8,4 +8,6 @@ module org.example.timerserver {
 
     opens org.example.timerserver to javafx.fxml;
     exports org.example.timerserver;
+    exports org.example.timerserver.Model;
+    exports org.example.timerserver.Model.Sensors;
 }
