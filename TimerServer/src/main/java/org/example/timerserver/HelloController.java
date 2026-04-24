@@ -33,7 +33,6 @@ import org.example.timerserver.Model.Sensors.*;
  * @since 2026-04-24
  */
 
-
 public class HelloController {
 
     // ==================== UI КОМПОНЕНТЫ ====================
@@ -143,12 +142,23 @@ public class HelloController {
     private void initSensors() {
         // Реализация метода...
 
-        /**
-         * Блокирует или разблокирует все элементы управления на вкладке "Настройка компонентов".
-         * Используется при запуске/остановке системы.
-         *
-         * @param disabled true - блокировать все элементы, false - разблокировать
-         */
+    /**
+     * Инициализирует датчики и подписывает их на Pulse Server.
+     *
+     * <p>Использует интерфейс {@link Subject#attach(Observer)} для регистрации
+     * каждого датчика в качестве наблюдателя. После подписки датчики будут
+     * автоматически получать уведомления при каждом изменении состояния.</p>
+     *
+     * <p><b>Связь с паттерном "Наблюдатель":</b></p>
+     * <pre>
+     * PulseServer (Subject) ──attach()──→ TemperatureSensor (Observer)
+     *                     └──attach()──→ HumiditySensor (Observer)
+     *                     └──attach()──→ LightSensor (Observer)
+     * </pre>
+     *
+     * @see Subject#attach(Observer)
+     * @see Observer#update(String)
+     */
 
         tempSensor = new TemperatureSensor(textArea);
         humiditySensor = new HumiditySensor(textArea);
@@ -671,7 +681,7 @@ public class HelloController {
         pulseTimeline = new Timeline(new KeyFrame(Duration.seconds(1), ev -> {
             if (systemRunning) {
                 localTime++;
-                pulseServer.pulse();
+                pulseServer.setState(localTime);
                 updateCharts();
             }
         }));
@@ -697,6 +707,8 @@ public class HelloController {
         failureTimeline.setCycleCount(Timeline.INDEFINITE);
         failureTimeline.play();
     }
+
+    
 
     private void checkRandomFailures() {
         // Случайные поломки датчиков

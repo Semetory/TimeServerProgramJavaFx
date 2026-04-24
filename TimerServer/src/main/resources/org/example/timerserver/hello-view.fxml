@@ -82,7 +82,7 @@
 
                     <!-- Консоль -->
                     <TextArea fx:id="textArea"
-                              prefHeight="120" maxHeight="120" VBox.vgrow="NEVER"
+                              prefHeight="240" maxHeight="240" VBox.vgrow="NEVER"
                               wrapText="true" editable="false"/>
 
                     <!-- Кнопки управления системой -->
