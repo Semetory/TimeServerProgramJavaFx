@@ -7,7 +7,26 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * Главный класс приложения Pulse Server.
+ * Загружает FXML-интерфейс и запускает JavaFX приложение.
+ *
+ * @author Дмитрий бИСТ-234
+ * @version 1.0
+ * @since 2026-04-24
+ */
+
+
 public class HelloApplication extends Application {
+
+    /**
+     * Точка входа в JavaFX приложение.
+     * Загружает FXML файл с пользовательским интерфейсом и отображает главное окно.
+     *
+     * @param stage первичная сцена, предоставляемая JavaFX
+     * @throws IOException если не удается загрузить FXML файл
+     */
+
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));

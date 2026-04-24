@@ -14,25 +14,63 @@ import org.controlsfx.control.ToggleSwitch;
 import org.example.timerserver.Model.PulseServer;
 import org.example.timerserver.Model.Sensors.*;
 
+/**
+ * Контроллер главного окна приложения Pulse Server.
+ * Управляет взаимодействием между пользовательским интерфейсом и моделью данных.
+ * Обрабатывает события от кнопок, переключателей и датчиков.
+ *
+ * <p>Основные функции:</p>
+ * <ul>
+ *   <li>Управление датчиками (температуры, влажности, освещенности)</li>
+ *   <li>Управление системой вентиляции с различными режимами работы</li>
+ *   <li>Управление системой освещения с режимами "Дискотека" и "Турбо"</li>
+ *   <li>Отображение данных в реальном времени на графиках</li>
+ *   <li>Логирование событий в консоль</li>
+ * </ul>
+ *
+ * @author Дмитрий
+ * @version 1.0
+ * @since 2026-04-24
+ */
+
+
 public class HelloController {
 
-    // Датчики
+    // ==================== UI КОМПОНЕНТЫ ====================
+
+    //Датчики
+
+    /** Переключатель активации датчика температуры на вкладке "Настройка компонентов" */
     @FXML private ToggleSwitch temperatureSwitch;
+    /** Переключатель активации датчика влажности на вкладке "Настройка компонентов" */
     @FXML private ToggleSwitch humiditySwitch;
+    /** Переключатель активации датчика освещенности на вкладке "Настройка компонентов" */
     @FXML private ToggleSwitch illuminationSwitch;
 
     // Система вентиляции
+    /** Переключатель активации системы вентиляции на вкладке "Настройка компонентов" */
     @FXML private ToggleSwitch systemVentilationSwitch;
+    /** Переключатель выбора варианта работы системы вентиляции на вкладке "Настройка компонентов" */
     @FXML private ToggleSwitch autoManualVentilationControlSwitch;
+    /** Переключатель выбора скорости системы вентиляции на вкладке "Настройка компонентов" */
     @FXML private Slider ventilationSlider;
+    /** Слайдер выбора скорости системы вентиляции на вкладке "Настройка компонентов" */
     @FXML private ToggleSwitch quietModeSwitch;
+    /** Переключатель выбора тихого режима вентиляции на вкладке "Настройка компонентов" */
     @FXML private ToggleSwitch fullPowerModeSwitch;
+    /** Переключатель выбора полоной мощности вентиляции на вкладке "Настройка компонентов" */
     @FXML private ToggleSwitch forcedVentilationSwitch;
+    /** Переключатель выбора принудительного вентилирования вентиляции на вкладке "Настройка компонентов" */
 
     // Система освещения
     @FXML private ToggleSwitch systemLightingControlSwitch;
+    /** Переключатель выбора включения освещения на вкладке "Настройка компонентов" */
     @FXML private ToggleSwitch systemLightDisco;
+    /** Переключатель на режим дискотеки освещения на вкладке "Настройка компонентов" */
     @FXML private ToggleSwitch systemLightILight;
+    /** Переключатель на режим турбо света освещения на вкладке "Настройка компонентов" */
+
+    /** Прочие ui компоненты*/
 
     // UI элементы
     @FXML private TextArea textArea;
@@ -79,6 +117,12 @@ public class HelloController {
     private boolean lightingJustBroken = false;
     private boolean lightingIsOn = false;
 
+    /**
+     * Инициализирует контроллер после загрузки FXML.
+     * Настраивает датчики, графики, таймеры и слушатели событий.
+     * Автоматически вызывается JavaFX после загрузки FXML файла.
+     */
+
     @FXML
     private void initialize() {
         initSensors();
@@ -91,7 +135,21 @@ public class HelloController {
         setAllControlsDisabled(true);
     }
 
+    /**
+     * Инициализирует все датчики и подписывает их на PulseServer.
+     * Создает экземпляры TemperatureSensor, HumiditySensor и LightSensor.
+     */
+
     private void initSensors() {
+        // Реализация метода...
+
+        /**
+         * Блокирует или разблокирует все элементы управления на вкладке "Настройка компонентов".
+         * Используется при запуске/остановке системы.
+         *
+         * @param disabled true - блокировать все элементы, false - разблокировать
+         */
+
         tempSensor = new TemperatureSensor(textArea);
         humiditySensor = new HumiditySensor(textArea);
         lightSensor = new LightSensor(textArea);
@@ -101,7 +159,17 @@ public class HelloController {
         pulseServer.attach(lightSensor);
     }
 
+    /**
+     * Блокирует или разблокирует все элементы управления на вкладке "Настройка компонентов".
+     * Используется при запуске/остановке системы.
+     *
+     * @param disabled true - блокировать все элементы, false - разблокировать
+     */
+
     private void setAllControlsDisabled(boolean disabled) {
+
+        // Реализация метода...
+
         // Датчики
         temperatureSwitch.setDisable(disabled);
         humiditySwitch.setDisable(disabled);
@@ -458,7 +526,14 @@ public class HelloController {
         }
     }
 
+    /**
+     * Блокирует или разблокирует элементы управления системой вентиляции.
+     *
+     * @param enabled true - разблокировать управление, false - заблокировать
+     */
+
     private void setVentilationControlsEnabled(boolean enabled) {
+        // Реализация метода...
         autoManualVentilationControlSwitch.setDisable(!enabled);
         ventilationSlider.setDisable(!enabled || !autoManualVentilationControlSwitch.isSelected());
         quietModeSwitch.setDisable(!enabled);
@@ -471,7 +546,26 @@ public class HelloController {
         systemLightILight.setDisable(!enabled);
     }
 
+    // ==================== УПРАВЛЕНИЕ СИСТЕМОЙ ====================
+
+    /**
+     * Запускает систему управления микроклиматом.
+     * Разблокирует все элементы управления и через 5 секунд автоматически активирует все датчики.
+     *
+     * <p>Последовательность действий:</p>
+     * <ol>
+     *   <li>Устанавливает флаг systemRunning = true</li>
+     *   <li>Разблокирует все переключатели</li>
+     *   <li>Записывает событие в консоль</li>
+     *   <li>Через 5 секунд включает все датчики и системы</li>
+     * </ol>
+     */
+
+
     private void startSystem() {
+
+        // Реализация метода...
+
         if (!systemRunning) {
             systemRunning = true;
             localTime = 0;
@@ -503,7 +597,24 @@ public class HelloController {
         }
     }
 
+    /**
+     * Останавливает систему управления микроклиматом.
+     * Блокирует все элементы управления и деактивирует все датчики.
+     *
+     * <p>Действия при остановке:</p>
+     * <ul>
+     *   <li>Выключает все переключатели</li>
+     *   <li>Деактивирует все датчики</li>
+     *   <li>Останавливает режимы "Дискотека" и "Турбо"</li>
+     *   <li>Блокирует все элементы управления</li>
+     *   <li>Устанавливает красный цвет для всех индикаторов</li>
+     * </ul>
+     */
+
     private void stopSystem() {
+
+        // Реализация метода...
+
         if (systemRunning) {
             systemRunning = false;
 
@@ -544,7 +655,19 @@ public class HelloController {
         });
     }
 
+    // ==================== УПРАВЛЕНИЕ ТАЙМЕРАМИ ====================
+
+    /**
+     * Запускает основной таймер Pulse Server.
+     * Генерирует сигнал "TICK" каждую секунду для всех подписанных датчиков.
+     *
+     * @see PulseServer#pulse()
+     */
+
     private void startPulseTimer() {
+
+        // Реализация метода...
+
         pulseTimeline = new Timeline(new KeyFrame(Duration.seconds(1), ev -> {
             if (systemRunning) {
                 localTime++;
@@ -556,7 +679,16 @@ public class HelloController {
         pulseTimeline.play();
     }
 
+    /**
+     * Запускает таймер проверки случайных поломок.
+     * Каждые 10 секунд с вероятностью 80% может сломать любой активный датчик.
+     * Также отслеживает повышенный риск поломки при использовании специальных режимов.
+     */
+
     private void startFailureCheckTimer() {
+
+        // Реализация метода...
+
         failureTimeline = new Timeline(new KeyFrame(Duration.seconds(10), ev -> {
             if (systemRunning) {
                 checkRandomFailures();
@@ -618,7 +750,17 @@ public class HelloController {
         }
     }
 
+    // ==================== ГРАФИКИ ====================
+
+    /**
+     * Инициализирует все графики для отображения показаний датчиков.
+     * Создает серии данных для температуры, влажности, освещенности и мощности вентиляции.
+     */
+
     private void initCharts() {
+
+        // Реализация метода...
+
         tempSeries = new XYChart.Series<>();
         tempSeries.setName("Температура");
         humiditySeries = new XYChart.Series<>();
@@ -631,7 +773,17 @@ public class HelloController {
         lineChart.getData().addAll(tempSeries, humiditySeries, lightSeries, ventilationSeries);
     }
 
+    /**
+     * Обновляет графики новыми показаниями датчиков.
+     * Обновление происходит каждые 5 секунд для оптимизации производительности.
+     *
+     * <p>Добавляет новые точки на график и удаляет старые, сохраняя только последние 20 значений.</p>
+     */
+
     private void updateCharts() {
+
+        // Реализация метода...
+
         if (localTime % 5 == 0) {
             if (temperatureSwitch.isSelected() && !tempSensor.isBroken()) {
                 tempSeries.getData().add(new XYChart.Data<>(localTime, tempSensor.getLastValue()));
@@ -648,19 +800,42 @@ public class HelloController {
         }
     }
 
+    // ==================== СИСТЕМА ВЕНТИЛЯЦИИ ====================
+
+    /**
+     * Обновляет значение мощности вентиляции на графике.
+     *
+     * @param power новое значение мощности в процентах (от 0 до 100)
+     */
+
     private void updateVentilationPower(double power) {
+        // Реализация метода...
         if (!ventilationBroken) {
             ventilationSeries.getData().add(new XYChart.Data<>(localTime, power));
             if (ventilationSeries.getData().size() > 20) ventilationSeries.getData().remove(0);
         }
     }
 
+    /**
+     * Применяет выбранный режим вентиляции (тихий, полная мощность, принудительный).
+     * Автоматически переключает управление в автоматический режим.
+     */
+
     private void applyVentilationMode() {
+        // Реализация метода...
         if (quietModeSwitch.isSelected()) updateVentilationPower(15);
         else if (fullPowerModeSwitch.isSelected()) updateVentilationPower(80);
         else if (forcedVentilationSwitch.isSelected()) updateVentilationPower(100);
         else updateVentilationPower(40);
     }
+
+    // ==================== СИСТЕМА ОСВЕЩЕНИЯ ====================
+
+    /**
+     * Запускает режим мигания для системы освещения.
+     *
+     * @param interval интервал мигания в секундах
+     */
 
     private void startDiscoMode(double interval) {
         stopDiscoMode();
@@ -675,14 +850,34 @@ public class HelloController {
         discoTimeline.play();
     }
 
+    /**
+     * Останавливает режим мигания системы освещения.
+     */
+
     private void stopDiscoMode() {
+        // Реализация метода...
         if (discoTimeline != null) {
             discoTimeline.stop();
             discoBlinking = false;
         }
     }
 
+    // ==================== ОБНОВЛЕНИЕ ИНДИКАТОРОВ ====================
+
+    /**
+     * Обновляет цветовые индикаторы датчиков на вкладке "Статус компонентов".
+     *
+     * <p>Цветовая схема:</p>
+     * <ul>
+     *   <li><b>Зеленый</b> - датчик активен и исправен</li>
+     *   <li><b>Красный</b> - датчик сломан или система остановлена</li>
+     *   <li><b>Желтый</b> - датчик только что сломался (первые 3 секунды)</li>
+     *   <li><b>Серый</b> - датчик выключен пользователем</li>
+     * </ul>
+     */
+
     private void updateSensorStatus() {
+        // Реализация метода...
         Platform.runLater(() -> {
             if (tempRect != null) {
                 if (!systemRunning) tempRect.setFill(Color.RED);
@@ -720,7 +915,13 @@ public class HelloController {
         resetTimeline.play();
     }
 
+    /**
+     * Обновляет цветовой индикатор системы вентиляции.
+     * Использует ту же цветовую схему, что и датчики.
+     */
+
     private void updateVentilationStatus() {
+        // Реализация метода...
         Platform.runLater(() -> {
             if (ventilationRect != null) {
                 if (!systemRunning) ventilationRect.setFill(Color.RED);
@@ -741,7 +942,13 @@ public class HelloController {
         }
     }
 
+    /**
+     * Обновляет цветовой индикатор системы освещения.
+     * При включенном освещении индикатор горит желтым цветом.
+     */
+
     private void updateLightingStatus() {
+        // Реализация метода...
         Platform.runLater(() -> {
             if (lightingRect != null) {
                 if (!systemRunning) lightingRect.setFill(Color.RED);
@@ -763,7 +970,15 @@ public class HelloController {
         }
     }
 
+    // ==================== ОБРАБОТКА ПОЛОМОК И РЕМОНТА ====================
+
+    /**
+     * Обрабатывает поломку системы вентиляции.
+     * Блокирует все связанные элементы управления и очищает график.
+     */
+
     private void breakVentilation() {
+        // Реализация метода...
         ventilationBroken = true;
         ventilationJustBroken = true;
         systemVentilationSwitch.setSelected(false);
@@ -777,7 +992,13 @@ public class HelloController {
         updateVentilationStatus();
     }
 
+    /**
+     * Восстанавливает систему вентиляции после поломки.
+     * Разблокирует управление, если система активна.
+     */
+
     private void repairVentilation() {
+        // Реализация метода...
         ventilationBroken = false;
         ventilationJustBroken = false;
         addLog("Система вентиляции отремонтирована!");
@@ -787,7 +1008,13 @@ public class HelloController {
         updateVentilationStatus();
     }
 
+    /**
+     * Обрабатывает поломку системы освещения.
+     * Останавливает режимы мигания и блокирует управление.
+     */
+
     private void breakLighting() {
+        // Реализация метода...
         lightingBroken = true;
         lightingJustBroken = true;
         lightingIsOn = false;
@@ -800,7 +1027,12 @@ public class HelloController {
         addLog("Система освещения сломана! Требуется ремонт.");
     }
 
+    /**
+     * Восстанавливает систему освещения после поломки.
+     */
+
     private void repairLighting() {
+        // Реализация метода...
         lightingBroken = false;
         lightingJustBroken = false;
         addLog("Система освещения отремонтирована!");
@@ -817,7 +1049,15 @@ public class HelloController {
         ventilationSeries.getData().clear();
     }
 
+    /**
+     * Добавляет сообщение в консоль вывода данных.
+     * Сообщения автоматически снабжаются временной меткой (секунды с момента запуска).
+     *
+     * @param message текст сообщения для вывода
+     */
+
     private void addLog(String message) {
+        // Реализация метода...
         Platform.runLater(() -> {
             textArea.appendText("[" + localTime + "с] " + message + "\n");
             textArea.setScrollTop(Double.MAX_VALUE);
