@@ -4,6 +4,24 @@ import javafx.application.Platform;
 import org.example.timerserver.Model.Observer;
 import javafx.scene.control.TextArea;
 
+/**
+
+* Датчик освещённости.
+* Реализует интерфейс Observer для получения уведомлений от PulseServer.
+* При получении сигнала "TICK
+* и выводит результат в консоль.
+* Датчик может находиться в следующих состояниях:
+* active - датчик включен и реагирует на TICK
+* broken - датчик сломан и не выполняет измерения
+* justBroken - датчик только что сломался (для желтого индикатора)
+* @author Дмитрий
+* @version 1.0
+* @since 2026-04-24
+* @see Observer
+* @see TemperatureSensor
+* @see HumiditySensor
+ */
+
 public class LightSensor implements Observer {
     private boolean active = false;
     private boolean broken = false;
