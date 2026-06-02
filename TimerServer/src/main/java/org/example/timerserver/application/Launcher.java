@@ -1,12 +1,6 @@
-package org.example.timerserver;
+package org.example.timerserver.application;
 
 import javafx.application.Application;
-
-/**
- * Точка входа в приложение.
- * Запускает JavaFX приложение.
- */
-
 
 public class Launcher {
     public static void main(String[] args) {
